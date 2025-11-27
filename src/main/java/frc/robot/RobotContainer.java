@@ -150,8 +150,7 @@ public class RobotContainer {
       return AutoAlignCoordinates.R.pose20;
   } else if (poseChooser.getSelected().equals(21)) {
       return AutoAlignCoordinates.R.pose21;
-  } else if (poseChooser.getSelected().equals(22)) {
-      return AutoAlignCoordinates.R.pose22;
+
   } else {
       return AutoAlignCoordinates.R.pose22;  // default case
   }
@@ -178,7 +177,7 @@ public class RobotContainer {
   SwerveInputStream driveAngularVelocityKeyboard = SwerveInputStream.of(driveBase.getSwerveDrive(),
                                                                         () -> -controllerP.getLeftY(),
                                                                         () -> -controllerP.getLeftX())
-                                                                    .withControllerRotationAxis(() -> controllerP.getRawAxis(
+                                                                    .withControllerRotationAxis(() -> -controllerP.getRawAxis(
                                                                         2))
                                                                     .deadband(OperatorConstants.DEADBAND)
                                                                     .scaleTranslation(0.8)

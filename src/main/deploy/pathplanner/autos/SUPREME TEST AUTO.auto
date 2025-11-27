@@ -1,0 +1,31 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Score 1 R"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "EC"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "Station 1 r"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

@@ -26,8 +26,8 @@ public class AutoAlign extends Command{
     // private final Field2d targetFieldAprilTag = new Field2d();
     // private Integer aprilTag = 0;
     // private final String side;
-    //private final SendableChooser<Integer> s_aprilTag = new SendableChooser<>();
-    //private final Pose2d driveTo; 
+    // private final SendableChooser<Integer> s_aprilTag = new SendableChooser<>();
+    // private final Pose2d driveTo; 
     Command alignCommand;
 
     

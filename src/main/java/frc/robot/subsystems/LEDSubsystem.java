@@ -59,7 +59,7 @@ public class LEDSubsystem extends SubsystemBase {
         else{
           setRainbowScrolling();
         }
-   }
+   }//penis
   //   public Command runPattern(LEDPattern pattern){
   //   return run(() -> pattern.applyTo(m_ledBuffer));
   //  }
@@ -102,3 +102,35 @@ public class LEDSubsystem extends SubsystemBase {
     
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// rice was here :) (signed by patnam singh)
