@@ -21,7 +21,7 @@ public class AlgaeEndeffactorSubsystem extends SubsystemBase{
  //   private final RelativeEncoder algaePivotMotorEncoder = algaePivotMotor.getEncoder();
     private final DutyCycleEncoder algaeDutyCycleEncoder = new DutyCycleEncoder(7);
 
-    private final PIDController pid = new PIDController(6, 0, 0);
+    private final PIDController pid = new PIDController(2, 0, 0);
 
     public AlgaeEndeffactorSubsystem (){
     }
