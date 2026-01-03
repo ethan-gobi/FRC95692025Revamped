@@ -1,0 +1,1 @@
+Implement and stabilize visual-inertial localization using AprilTags and PhotonVision, fusing vision-based pose estimates with drivetrain odometry (gyro + wheel encoders) to improve global field positioning accuracy for autonomous routines and auto-align features
