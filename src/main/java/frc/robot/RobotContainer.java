@@ -158,15 +158,15 @@ public class RobotContainer {
     }
   
   SwerveInputStream driveAngularVelocity = SwerveInputStream.of(driveBase.getSwerveDrive(),
-                                                                ()-> controllerP.getLeftY()*-1,
-                                                                ()-> controllerP.getLeftX()*-1)
+                                                                ()-> controllerP.getLeftY()*-1 * 0.05,
+                                                                ()-> controllerP.getLeftX()*-1 * 0.05)
                                                                 .withControllerRotationAxis(controllerP::getRightX)
                                                                 .deadband(OperatorConstants.DEADBAND)
                                                                 .scaleTranslation(1)
                                                                 .allianceRelativeControl(true);
 
-  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(controllerP::getRightX, 
-                                                                                            controllerP::getRightY)
+  SwerveInputStream driveDirectAngle = driveAngularVelocity.copy().withControllerHeadingAxis(() -> controllerP.getRightX() * 0.05, 
+                                                                                            () -> controllerP.getRightY() * 0.05)
                                                                                             .headingWhile(true);
 
   Command driveFieldOritentedDirectAngle = driveBase.driveFieldOriented(driveDirectAngle);   
