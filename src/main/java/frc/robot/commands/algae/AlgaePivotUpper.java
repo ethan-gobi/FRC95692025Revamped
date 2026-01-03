@@ -1,0 +1,37 @@
+package frc.robot.commands.algae;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.subsystems.algae.AlgaeEndeffactorSubsystem;
+import frc.robot.subsystems.coral.CoralEndeffactorSubsystem;
+
+public class AlgaePivotUpper extends Command {
+
+      private final AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem; 
+      private final Timer time = new Timer();
+
+    public AlgaePivotUpper(AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem){
+        this.algaeEndeffactorSubsystem = algaeEndeffactorSubsystem;
+        addRequirements(algaeEndeffactorSubsystem);
+    }
+    
+      @Override
+    public void initialize(){
+    }
+
+    @Override
+    public void execute(){
+        algaeEndeffactorSubsystem.algaeSetPoint(-0.36);
+       
+    }
+    @Override
+    public void end(boolean interrupted){
+        algaeEndeffactorSubsystem.algaePivotStop();
+    }
+    @Override
+    public boolean isFinished(){
+        return false;// Math.abs(900 - elevatorSubsystem.getPoint()) < 20; 
+    }
+    
+}
