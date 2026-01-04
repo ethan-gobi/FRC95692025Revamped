@@ -1,37 +1,32 @@
 package frc.robot.commands.algae;
 
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.algae.AlgaeEndeffactorSubsystem;
-import frc.robot.subsystems.coral.CoralEndeffactorSubsystem;
 
+/**
+ * Lowers the algae pivot to the resting position.
+ */
 public class AlgaePivotDown extends Command {
 
-      private final AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem; 
-      private final Timer time = new Timer();
+  private final AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem;
 
-    public AlgaePivotDown(AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem){
-        this.algaeEndeffactorSubsystem = algaeEndeffactorSubsystem;
-        addRequirements(algaeEndeffactorSubsystem);
-    }
-    
-      @Override
-    public void initialize(){
-    }
+  public AlgaePivotDown(AlgaeEndeffactorSubsystem algaeEndeffactorSubsystem) {
+    this.algaeEndeffactorSubsystem = algaeEndeffactorSubsystem;
+    addRequirements(algaeEndeffactorSubsystem);
+  }
 
-    @Override
-    public void execute(){
-        algaeEndeffactorSubsystem.algaeSetPoint(0);
-       
-    }
-    @Override
-    public void end(boolean interrupted){
-        algaeEndeffactorSubsystem.algaePivotStop();
-    }
-    @Override
-    public boolean isFinished(){
-        return false;// Math.abs(900 - elevatorSubsystem.getPoint()) < 20; 
-    }
-    
+  @Override
+  public void execute() {
+    algaeEndeffactorSubsystem.algaeSetPoint(0);
+  }
+
+  @Override
+  public void end(boolean interrupted) {
+    algaeEndeffactorSubsystem.algaePivotStop();
+  }
+
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
 }

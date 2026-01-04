@@ -54,6 +54,7 @@ def includeDesktopSupport = true
 dependencies {
     annotationProcessor wpi.java.deps.wpilibAnnotations()
     implementation wpi.java.deps.wpilib()
+    implementation "edu.wpi.first.wpilibNewCommands:wpilibNewCommands-java:${wpi.versions.wpilibVersion}"
     implementation wpi.java.vendor.java()
 
     roborioDebug wpi.java.deps.wpilibJniDebug(wpi.platforms.roborio)

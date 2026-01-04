@@ -19,3 +19,10 @@ The codebase is organized by **mechanism and responsibility** to keep it readabl
 
 These changes are structural only—robot behavior, hardware mappings, and tuning values remain exactly the same.
 
+## ✅ Ongoing OOP Cleanup (current)
+
+- **Command-based clarity:** All commands now extend WPILib `Command`, declare requirements, and include Javadocs that describe intent and operator mapping, making them easier for new students to follow.
+- **Container readability:** `RobotContainer` was reorganized to clearly show subsystem creation, controller bindings, drive mode setup, and PathPlanner command registration.
+- **Subsystem documentation:** Elevator, LED, vision, and manipulator subsystems received concise class-level Javadocs and cleaned methods without leftover commented code.
+- **Dependencies:** The WPILib new-command library is explicitly declared in `build.gradle` to ensure the command classes resolve cleanly across environments.
+

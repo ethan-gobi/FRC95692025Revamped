@@ -3,57 +3,44 @@ package frc.robot.commands.elevator;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
+/**
+ * Cycles the elevator through predefined height setpoints.
+ */
 public class ElevatorCycle extends Command {
-    private final ElevatorSubsystem elevatorSubsystem;
-    private final double dir;
+  private final ElevatorSubsystem elevatorSubsystem;
+  private final int direction;
 
-    public ElevatorCycle(ElevatorSubsystem elevatorSubsystem, double dir) {
-        this.elevatorSubsystem = elevatorSubsystem;
-        this.dir = dir;
-        addRequirements(elevatorSubsystem);
+  /**
+   * Creates a cycling command that moves the elevator up or down one level.
+   *
+   * @param elevatorSubsystem elevator being controlled
+   * @param direction +1 to raise, -1 to lower
+   */
+  public ElevatorCycle(ElevatorSubsystem elevatorSubsystem, int direction) {
+    this.elevatorSubsystem = elevatorSubsystem;
+    this.direction = direction;
+    addRequirements(elevatorSubsystem);
+  }
 
-    }
+  @Override
+  public void initialize() {
+    int targetLevel = elevatorSubsystem.clampLevel(elevatorSubsystem.getLevel() + direction);
+    elevatorSubsystem.setLevel(targetLevel);
+    Command nextCommand = createLevelCommand(targetLevel);
+    nextCommand.schedule();
+  }
 
-    @Override
-    public void initialize() {
+  private Command createLevelCommand(int targetLevel) {
+    return switch (targetLevel) {
+      case 3 -> new ElevatorL3Command(elevatorSubsystem);
+      case 2 -> new ElevatorL2Command(elevatorSubsystem);
+      case 1 -> new ElevatorL1Command(elevatorSubsystem);
+      default -> new ElevatorZeroCommand(elevatorSubsystem);
+    };
+  }
 
-        int curlevel = elevatorSubsystem.getLevel();
-        curlevel += dir;
-        Command run; 
-        
-        if (curlevel == 3) {
-            run = new ElevatorL3Command(elevatorSubsystem);
-        }
-       else if (curlevel == 2) {
-           run = new ElevatorL2Command(elevatorSubsystem);
-
-        }
-        else if (curlevel == 1) {
-            run = new ElevatorZeroCommand(elevatorSubsystem);
-        }
-        else if (curlevel == 0) {
-            run = new ElevatorZeroCommand(elevatorSubsystem);
-        }
-        else if (curlevel == 4) {
-            run = new ElevatorL3Command(elevatorSubsystem);
-        }
-        else{
-            run = new ElevatorZeroCommand(elevatorSubsystem);
-        }
-        run.schedule();
-    }
-
-    @Override
-    public void execute() {
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-    }
-
-    @Override
-    public boolean isFinished() {
-        return true;// Math.abs(900 - elevatorSubsystem.getPoint()) < 20;
-    }
-
+  @Override
+  public boolean isFinished() {
+    return true;
+  }
 }
