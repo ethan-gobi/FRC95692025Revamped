@@ -1,1 +1,8 @@
 Implement and stabilize visual-inertial localization using AprilTags and PhotonVision, fusing vision-based pose estimates with drivetrain odometry (gyro + wheel encoders) to improve global field positioning accuracy for autonomous routines and auto-align features
+  
+Key next steps:
+- Add IMU bias estimation and periodic re-zeroing routines to keep gyro drift low during long matches.
+- Evaluate PhotonVision latency timestamps and feed them into pose estimators so vision measurements are fused at the correct times.
+- Create a Kalman filter (or pose estimator helper) that ingests swerve odometry, gyro, and vision targets, with tunable trust parameters for noisy or partial tag visibility.
+- Build a dashboard view showing vision covariance, number of detected tags, and the final fused pose to debug on-field performance.
+- Simulate tag layouts and camera transforms to validate the filter before on-robot testing.
