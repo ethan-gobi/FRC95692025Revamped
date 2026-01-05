@@ -26,3 +26,10 @@ These changes are structural only—robot behavior, hardware mappings, and tunin
 - **Subsystem documentation:** Elevator, LED, vision, and manipulator subsystems received concise class-level Javadocs and cleaned methods without leftover commented code.
 - **Dependencies:** The WPILib new-command library is explicitly declared in `build.gradle` to ensure the command classes resolve cleanly across environments.
 
+## 📸 Subsystem visuals and references
+
+- **Swerve:** WPILib swerve kinematics diagram — https://docs.wpilib.org/en/stable/_images/swerve-kinematics.png
+- **Elevator:** WPILib elevator schematic — https://docs.wpilib.org/en/stable/_images/pid-elevator-diagram.png
+- **Vision:** PhotonVision camera/UI example — https://docs.photonvision.org/en/latest/_images/photonvision-camera.png
+- **LEDs:** Addressable LED strip reference — https://docs.wpilib.org/en/stable/_images/addressable-led-strip.png
+- **Coral/Algae manipulators:** REEFSCAPE game piece reference image — https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/game-day-survey/2025-game-pieces.png

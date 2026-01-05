@@ -37,6 +37,9 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 /**
  * Subsystem responsible for swerve drive control, odometry, and vision fusion.
+ *
+ * <p>Subsystem visuals: <a href="https://docs.wpilib.org/en/stable/_images/swerve-kinematics.png">WPILib
+ * swerve module diagram</a>.
  */
 public class SwerveSubsystem extends SubsystemBase {
 

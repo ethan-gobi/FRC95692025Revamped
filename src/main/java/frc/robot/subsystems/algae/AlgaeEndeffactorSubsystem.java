@@ -11,6 +11,10 @@ import frc.robot.constants.Constants.HardwareMap;
 
 /**
  * Controls the algae intake motor and pivot mechanism.
+ *
+ * <p>Subsystem visuals: <a
+ * href="https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/game-day-survey/2025-game-pieces.png">REEFSCAPE
+ * algae game piece reference</a>.
  */
 public class AlgaeEndeffactorSubsystem extends SubsystemBase {
   private final SparkMax algaeMotor = new SparkMax(HardwareMap.IT_ALGAE, MotorType.kBrushless);

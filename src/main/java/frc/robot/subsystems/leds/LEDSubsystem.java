@@ -14,6 +14,9 @@ import static edu.wpi.first.units.Units.Second;
 
 /**
  * Manages addressable LED animations that reflect robot status.
+ *
+ * <p>Subsystem visuals: <a href="https://docs.wpilib.org/en/stable/_images/addressable-led-strip.png">Addressable
+ * LED strip reference image</a>.
  */
 public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED led = new AddressableLED(9);

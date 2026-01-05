@@ -23,6 +23,9 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
  * Provides AprilTag-based pose estimation from dual PhotonVision cameras.
+ *
+ * <p>Subsystem visuals: <a href="https://docs.photonvision.org/en/latest/_images/photonvision-camera.png">PhotonVision
+ * camera and UI example</a>.
  */
 public class Vision extends SubsystemBase {
   private static final AprilTagFieldLayout FIELD_LAYOUT =

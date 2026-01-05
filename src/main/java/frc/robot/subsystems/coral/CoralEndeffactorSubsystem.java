@@ -9,6 +9,10 @@ import frc.robot.constants.Constants.HardwareMap;
 
 /**
  * Controls coral intake motors and beam break detection.
+ *
+ * <p>Subsystem visuals: <a
+ * href="https://www.firstinspires.org/sites/default/files/uploads/resource_library/frc/game-and-season-info/game-day-survey/2025-game-pieces.png">REEFSCAPE
+ * coral game piece reference</a>.
  */
 public class CoralEndeffactorSubsystem extends SubsystemBase {
   private final SparkMax leftCoralMotor = new SparkMax(HardwareMap.IT_CORAL_L, MotorType.kBrushless);

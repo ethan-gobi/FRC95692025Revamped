@@ -14,6 +14,9 @@ import frc.robot.constants.Constants.HardwareMap;
 
 /**
  * Controls the elevator motors and tracks the current height level.
+ *
+ * <p>Subsystem visuals: <a href="https://docs.wpilib.org/en/stable/_images/pid-elevator-diagram.png">WPILib
+ * elevator schematic</a>.
  */
 public class ElevatorSubsystem extends SubsystemBase {
 
