@@ -1,33 +1,36 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.constants;
-
-import java.util.HashMap;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants. This class should not be used for any other purpose. All constants should be declared
- * globally (i.e. public static). Do not put anything functional in this class.
- *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * Central location for robot-wide constants grouped by responsibility.
  */
 public final class Constants {
+
+  private Constants() {}
+
+  /**
+   * Driver input configuration constants.
+   */
   public static class OperatorConstants {
     public static final int kDriverControllerPort = 2;
     public static final double DEADBAND = 0.1; 
     public static final double TURN_FACTOR = 0.5; 
   }
+
+  /**
+   * Limits for swerve drive behavior.
+   */
   public static class SwerveConstants {
     public static final double MAX_SPEED = Units.feetToMeters(10.5);;
     public static final double SCALE_TRANSLATION = 1; 
   }
+
+  /**
+   * CAN IDs and other hardware mappings.
+   */
   public static class HardwareMap {
     public static final int IT_ELEVATOR_L = 40;
     public static final int IT_ELEVATOR_R = 41;
@@ -39,10 +42,10 @@ public final class Constants {
     public static final int IT_ALGAE_PIVOT = 39;
   }
 
-  public static class PIDVALUES {
-  }
-
-  public static class ElevatorConstnats {
+  /**
+   * Elevator setpoints measured in encoder ticks.
+   */
+  public static class ElevatorConstants {
     public static final double L3 = 880; 
     public static final double L2 = 250; 
     public static final double L1 = 30; 
@@ -50,7 +53,10 @@ public final class Constants {
 
   }
 
-  public class AutoAlignCoordinates {
+  /**
+   * Predefined auto-alignment poses for the field.
+   */
+  public static class AutoAlignCoordinates {
 
     public static class L {
         public static final Pose2d pose6 = new Pose2d(13.65, 2.8, new Rotation2d(Math.toRadians(-60)));

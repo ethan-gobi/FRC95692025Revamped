@@ -1,240 +1,124 @@
 package frc.robot.subsystems.vision;
 
-import static edu.wpi.first.units.Units.Microseconds;
-import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Seconds;
-
-
-import java.lang.StackWalker.Option;
+import java.util.List;
 import java.util.Optional;
 
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/**
+ * Provides AprilTag-based pose estimation from dual PhotonVision cameras.
+ *
+ * <p>Subsystem visuals: <a href="https://docs.photonvision.org/en/latest/_images/photonvision-camera.png">PhotonVision
+ * camera and UI example</a>.
+ */
+public class Vision extends SubsystemBase {
+  private static final AprilTagFieldLayout FIELD_LAYOUT =
+      AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
 
-import edu.wpi.first.apriltag.AprilTagFieldLayout;
-import edu.wpi.first.apriltag.AprilTagFields;
-import edu.wpi.first.math.Matrix;
-import edu.wpi.first.math.VecBuilder;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.math.numbers.N1;
-import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTablesJNI;
-import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.Alert.AlertType;
-import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import frc.robot.Robot;
-import java.awt.Desktop;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
+  private final PhotonCamera rightCamera = new PhotonCamera("End Effector Camera");
+  private final PhotonCamera leftCamera = new PhotonCamera("left camera");
 
-import javax.sound.sampled.SourceDataLine;
+  private final Transform3d robotToRightCamera =
+      new Transform3d(new Translation3d(-0.13172, 0.32659, 0.338), new Rotation3d(0, 0, Math.PI));
+  private final Transform3d robotToLeftCamera =
+      new Transform3d(new Translation3d(-0.13172, -0.32659, 0.338), new Rotation3d(0, 0, Math.PI));
 
-import org.photonvision.EstimatedRobotPose;
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
-import org.photonvision.PhotonUtils;
-import org.photonvision.simulation.PhotonCameraSim;
-import org.photonvision.simulation.SimCameraProperties;
-import org.photonvision.simulation.VisionSystemSim;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
-import swervelib.SwerveDrive;
-import swervelib.telemetry.SwerveDriveTelemetry;
+  private final PhotonPoseEstimator rightPoseEstimator =
+      new PhotonPoseEstimator(FIELD_LAYOUT, PoseStrategy.AVERAGE_BEST_TARGETS, robotToRightCamera);
+  private final PhotonPoseEstimator leftPoseEstimator =
+      new PhotonPoseEstimator(FIELD_LAYOUT, PoseStrategy.AVERAGE_BEST_TARGETS, robotToLeftCamera);
 
+  private final Field2d field = new Field2d();
 
+  private Optional<EstimatedRobotPose> latestEstimatedPoseRight = Optional.empty();
+  private Optional<EstimatedRobotPose> latestEstimatedPoseLeft = Optional.empty();
 
-public class Vision extends SubsystemBase{
-    //field 
-    public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(AprilTagFields.k2025Reefscape);
-    
-    //camera
-    private PhotonCamera endEffectorCameraR = new PhotonCamera("End Effector Camera"); 
-    private PhotonCamera endEffectorCameraL = new PhotonCamera("left camera");
-    
-    //stored value of robto cam postiont
-    private Transform3d robotToCamR = new Transform3d(new Translation3d(-0.13172, 0.32659, 0.338), new Rotation3d(0, 0, 3.141592653589793));
-    private Transform3d robotToCamL = new Transform3d(new Translation3d(-0.13172, -0.32659, 0.338),
-            new Rotation3d(0, 0, 3.141592653589793));
+  private PhotonPipelineResult latestResultRight = new PhotonPipelineResult();
+  private PhotonPipelineResult latestResultLeft = new PhotonPipelineResult();
+  private Pose3d referencePose = new Pose3d();
+  private int targetId;
 
-    //x: 0.327
-    //y: 0.1317
-    //z: 0.338
-    
-    //calculator for pose
-    private PhotonPoseEstimator photonPoseEstimatorR = new PhotonPoseEstimator(
-        fieldLayout, 
-        PoseStrategy.AVERAGE_BEST_TARGETS,
-        robotToCamR);
-    private PhotonPoseEstimator photonPoseEstimatorL = new PhotonPoseEstimator(
-        fieldLayout,
-        PoseStrategy.AVERAGE_BEST_TARGETS,
-        robotToCamL);
+  public Vision() {
+    SmartDashboard.putData("photon subsystem", field);
+  }
 
-    //this is just for smart dashboard purposes
-    private final Field2d field = new Field2d();
+  public Optional<EstimatedRobotPose> getRightPoseEstimate() {
+    return latestEstimatedPoseRight;
+  }
 
-    private List<PhotonTrackedTarget> currentAprilTags; 
-    // private Optional<Pose3d> tagPose3dOpt;
-    // public double xTag = 0;
-    // public double yTag = 0;;
-    // public double rotationTag = 0;
+  public Optional<EstimatedRobotPose> getLeftPoseEstimate() {
+    return latestEstimatedPoseLeft;
+  }
 
-    //last reference point
-    private Pose3d referencePose; 
+  public Optional<Pose2d> getPose2dR() {
+    return latestEstimatedPoseRight.map(pose -> pose.estimatedPose.toPose2d());
+  }
 
-    //estimated pose
-    private Optional<EstimatedRobotPose> latestEstimatedPoseR = Optional.empty();
-    private Optional<EstimatedRobotPose> latestEstimatedPoseL = Optional.empty();
+  public Optional<Pose2d> getPose2dL() {
+    return latestEstimatedPoseLeft.map(pose -> pose.estimatedPose.toPose2d());
+  }
 
-    Pose3d estimatedRobotPoseR =  new Pose3d(0,0,0,new Rotation3d(0,0,0));
-    Pose3d estimatedRobotPoseL = new Pose3d(0, 0, 0, new Rotation3d(0, 0, 0));
-    boolean hasTargetsR, hasTargetsL;
-    PhotonPipelineResult resultR, resultL;
-    
-    public int targetId =0; 
-    //construct stuff
-    public Vision(){
-        SmartDashboard.putData("photon subsytem", field);
-        referencePose = new Pose3d(0,0,0,new Rotation3d(0,0,0));
+  public Optional<Double> getTimestampR() {
+    return latestEstimatedPoseRight.map(pose -> pose.timestampSeconds);
+  }
+
+  public Optional<Double> getTimestampL() {
+    return latestEstimatedPoseLeft.map(pose -> pose.timestampSeconds);
+  }
+
+  public List<PhotonTrackedTarget> getCurrentTargetsRight() {
+    return latestResultRight.getTargets();
+  }
+
+  public List<PhotonTrackedTarget> getCurrentTargetsLeft() {
+    return latestResultLeft.getTargets();
+  }
+
+  public void setReferencePose(Pose3d refPose3d) {
+    referencePose = refPose3d;
+  }
+
+  @Override
+  public void periodic() {
+    latestResultRight = rightCamera.getLatestResult();
+    latestResultLeft = leftCamera.getLatestResult();
+
+    if (latestResultRight.hasTargets()) {
+      latestEstimatedPoseRight = rightPoseEstimator.update(latestResultRight);
+      targetId = latestResultRight.getBestTarget().fiducialId;
+    } else {
+      latestEstimatedPoseRight = Optional.empty();
     }
 
-    public Optional<EstimatedRobotPose> getR() {
-        return latestEstimatedPoseR;
+    if (latestResultLeft.hasTargets()) {
+      latestEstimatedPoseLeft = leftPoseEstimator.update(latestResultLeft);
+    } else {
+      latestEstimatedPoseLeft = Optional.empty();
     }
 
-    public Optional<EstimatedRobotPose> getL() {
-        return latestEstimatedPoseL;
-    }
-    
+    rightPoseEstimator.setReferencePose(referencePose);
+    leftPoseEstimator.setReferencePose(referencePose);
 
-    //get pose 3d 
-    public Optional<Pose3d> getPose3dR() {
-        return latestEstimatedPoseR.map(stuff -> stuff.estimatedPose);
-    }
-    
-    public Optional<Pose3d> getPose3dL() {
-        return latestEstimatedPoseL.map(stuff -> stuff.estimatedPose);
-    }
+    latestEstimatedPoseRight.ifPresent(pose -> field.setRobotPose(pose.estimatedPose.toPose2d()));
 
-    //get pose 2d (to who ever is reading my code, use this for odom) 
-    public Optional<Pose2d> getPose2dR(){
-        return getPose3dR().map(pose3d -> pose3d.toPose2d());
-    }
-
-    public Optional<Pose2d> getPose2dL() {
-        return getPose3dL().map(pose3d -> pose3d.toPose2d());
-    }
-
-    public List<PhotonTrackedTarget> getAprilTags(){
-        return currentAprilTags;
-    }
-
-    public void setReferencePose (Pose3d refPose3d){
-        referencePose = refPose3d;
-    }
-
-    public Optional<Double> getTimestampR() {
-        return latestEstimatedPoseR.map(x -> x.timestampSeconds);
-    }
-
-    public Optional<Double> getTimestampL() {
-        return latestEstimatedPoseL.map(x -> x.timestampSeconds);
-    }
-
-    public List<PhotonTrackedTarget> getAllCurrentTargets() {
-        hasTargetsR = resultR.hasTargets();
-        List<PhotonTrackedTarget> aprilTags = resultR.getTargets();
-
-        hasTargetsL= resultL.hasTargets();
-        aprilTags = resultL.getTargets();
-        return aprilTags;
-    }
-    //update the pose every so often and also set the refrence point 
-    @Override
-    public void periodic(){
-
-        resultR = endEffectorCameraR.getLatestResult();
-        resultL = endEffectorCameraL.getLatestResult();
-        currentAprilTags = getAllCurrentTargets(); 
-
-        if(hasTargetsR){
-            latestEstimatedPoseR = photonPoseEstimatorR.update(resultR);
-        }
-        if (hasTargetsL) {
-            latestEstimatedPoseL = photonPoseEstimatorL.update(resultL);
-        }
-        photonPoseEstimatorR.setReferencePose(referencePose);
-        SmartDashboard.putBoolean("has target R", hasTargetsR);
-        SmartDashboard.putBoolean("has target L", hasTargetsL);
-
-        List<PhotonTrackedTarget> targets;
-        PhotonTrackedTarget bestTarget;
-        
-        
-
-        if(hasTargetsR){
-            targets = resultR.getTargets();
-            bestTarget = resultR.getBestTarget();
-            targetId = bestTarget.fiducialId;
-
-            if(fieldLayout.getTagPose(bestTarget.getFiducialId()).isPresent()){
-                estimatedRobotPoseR = PhotonUtils.estimateFieldToRobotAprilTag(bestTarget.getBestCameraToTarget(), fieldLayout.getTagPose(bestTarget.getFiducialId()).get(), bestTarget.getBestCameraToTarget());
-                Pose2d robotconversion = new Pose2d(estimatedRobotPoseR.getTranslation().getX(), estimatedRobotPoseL.getTranslation().getY(), new Rotation2d(estimatedRobotPoseL.getRotation().getZ()));
-                field.setRobotPose(robotconversion);
-                // tagPose3dOpt = fieldLayout.getTagPose(targetId);
-                
-            }
-
-
-        }
-        
-        else if(hasTargetsL){
-            targets = resultL.getTargets();
-            bestTarget = resultL.getBestTarget();
-            targetId = bestTarget.fiducialId;
-
-        }
-        SmartDashboard.putNumber("AprilTag X", fieldLayout.getTagPose(18).get().getX());
-        SmartDashboard.putNumber("AprilTag Y", fieldLayout.getTagPose(18).get().getY());
-        SmartDashboard.putNumber("AprilTag Rotation (deg)", fieldLayout.getTagPose(18).get().getRotation().getAngle());
-        
-       
-        SmartDashboard.putNumber("id april", targetId);
-
-    }
-
-    // public Optional<Pose3d> getEstimatedGlobalPose (){
-
-    // if(latestEstimatedPose.isPresent()){
-    // //Pose3d pose = latestEstimatedPose.get();
-    // }
-    // else {
-
-    // }
-    // }
-
+    SmartDashboard.putBoolean("has target R", latestResultRight.hasTargets());
+    SmartDashboard.putBoolean("has target L", latestResultLeft.hasTargets());
+    SmartDashboard.putNumber("id april", targetId);
+  }
 }
